@@ -1,0 +1,33 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+
+#chart {
+  margin: 20px auto;
+  max-width: 800px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.axis-label {
+  font-size: 12px;
+  fill: #333;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+.subtitle {
+  font-size: 14px;
+  text-anchor: middle;
+  fill: #555;
+}
