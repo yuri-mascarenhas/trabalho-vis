@@ -5,6 +5,14 @@ body {
   padding: 0;
 }
 
+header {
+  display: flex;
+  height: 10%;
+  background-color: #aaa;
+  justify-content: space-between;
+  padding: 0 0.5em;
+}
+
 #chart {
   margin: 20px auto;
   max-width: 800px;
