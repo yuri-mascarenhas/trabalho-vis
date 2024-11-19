@@ -16,23 +16,16 @@ class BarChart {
       sales,
     }));
 
+    const { margin } = this.config;
+
     // SVG creation
     this.svg = d3
       .select(this.selector)
       .append("svg")
-      .attr(
-        "width",
-        this.config.width + this.config.margin.left + this.config.margin.top
-      )
-      .attr(
-        "height",
-        this.config.height + this.config.margin.top + this.config.margin.bottom
-      )
+      .attr("width", this.width + margin.left + margin.top)
+      .attr("height", this.height + margin.top + margin.bottom)
       .append("g")
-      .attr(
-        "transform",
-        `translate(${this.config.margin.left},${this.config.margin.top})`
-      );
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
     this.x = d3
@@ -56,6 +49,8 @@ class BarChart {
   }
 
   render() {
+    const { colors } = this.config;
+
     // Render bars using aggregated data
     this.svg
       .selectAll("rect")
@@ -70,11 +65,11 @@ class BarChart {
         const yVal = this.y(d.sales);
         return yVal;
       })
-      .attr("width", this.x.bandwidth()) // Ensure bandwidth is valid
+      .attr("width", this.x.bandwidth())
       .attr("height", (d) => {
         const heightVal = this.height - this.y(d.sales);
         return heightVal;
       })
-      .attr("fill", this.config.colors.bar); // Use config for colors
+      .attr("fill", colors.bar);
   }
 }
