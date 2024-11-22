@@ -56,30 +56,30 @@ class BarChart {
   render() {
     const { colors } = this.config;
 
-    // Render bars using aggregated data
-    this.svg
-      .selectAll("rect")
-      .data(this.data)
+    const xKey = Object.keys(this.data[0])[0];
+    const yKey = Object.keys(this.data[0])[1];
+
+    this.x.domain(this.data.map((d) => d[xKey]));
+    this.y.domain([0, d3.max(this.data, (d) => d[yKey])]);
+
+    // Update axes
+    this.xAxisGroup.call(d3.axisBottom(this.x));
+    this.yAxisGroup.call(d3.axisLeft(this.y));
+
+    // Render bars
+    const bars = this.svg.selectAll("rect").data(this.data);
+
+    bars
       .enter()
       .append("rect")
-      .attr("x", (d) => {
-        const xVal = this.x(d.category);
-        return xVal;
-      })
-      .attr("y", (d) => {
-        const yVal = this.y(d.sales);
-        return yVal;
-      })
+      .merge(bars)
+      .attr("x", (d) => this.x(d[xKey]))
+      .attr("y", (d) => this.y(d[yKey]))
       .attr("width", this.x.bandwidth())
-      .attr("height", (d) => {
-        const heightVal = this.height - this.y(d.sales);
-        return heightVal;
-      })
+      .attr("height", (d) => this.height - this.y(d[yKey]))
       .attr("fill", colors.bar);
-  }
 
-  update(newData) {
-    this.data = newData;
-    this.render();
+    // Remove any extra bars
+    bars.exit().remove();
   }
 }

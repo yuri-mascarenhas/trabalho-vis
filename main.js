@@ -4,7 +4,6 @@ const loadData = async (file) => {
   return data;
 };
 
-// Prepare Datasets
 const prepareDatasets = (data) => {
   const salesByCategory = d3
     .rollups(
@@ -59,7 +58,7 @@ const main = async () => {
 
   let barChart = new BarChart(".bar-charts", config, datasets.salesByCategory);
 
-  // Render charts
+  // Render
   barChart.render();
 
   d3.select(".bar-selector")
