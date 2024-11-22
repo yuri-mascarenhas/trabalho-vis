@@ -102,7 +102,10 @@ class BarChart {
 
   update(newData, newLabels) {
     this.data = newData;
-    this.config.labels = newLabels;
+    if (newLabels) {
+      this.xAxisLabel.text(newLabels.x || xKey);
+      this.yAxisLabel.text(newLabels.y || yKey);
+    }
     this.render();
   }
 }
