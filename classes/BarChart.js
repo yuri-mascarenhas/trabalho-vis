@@ -55,6 +55,7 @@ class BarChart {
 
   render() {
     const { colors } = this.config;
+    const tooltip = d3.select("#tooltip"); // Select the tooltip div
 
     const xKey = Object.keys(this.data[0])[0];
     const yKey = Object.keys(this.data[0])[1];
@@ -63,11 +64,7 @@ class BarChart {
     this.y.domain([0, d3.max(this.data, (d) => d[yKey])]);
 
     // Update axes
-    this.xAxisGroup
-      .call(d3.axisBottom(this.x))
-      .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
+    this.xAxisGroup.call(d3.axisBottom(this.x));
     this.yAxisGroup.call(d3.axisLeft(this.y));
 
     // Render bars
@@ -81,9 +78,25 @@ class BarChart {
       .attr("y", (d) => this.y(d[yKey]))
       .attr("width", this.x.bandwidth())
       .attr("height", (d) => this.height - this.y(d[yKey]))
-      .attr("fill", colors.bar);
+      .attr("fill", colors.bar)
+      .on("mouseover", function (event, d) {
+        d3.select(this).attr("fill", "orange"); // Highlight bar
+        tooltip
+          .style("opacity", 1)
+          .html(`<strong>${d[xKey]}</strong><br>Value: ${d[yKey]}`)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY - 20}px`);
+      })
+      .on("mousemove", function (event) {
+        tooltip
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY - 20}px`);
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("fill", colors.bar); // Reset bar color
+        tooltip.style("opacity", 0); // Hide tooltip
+      });
 
-    // Remove any extra bars
     bars.exit().remove();
   }
 

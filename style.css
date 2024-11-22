@@ -68,3 +68,12 @@ main {
 .chart {
   box-shadow: 3px 3px 5px gray;
 }
+
+#tooltip {
+  position: absolute;
+  opacity: 0;
+  background: lightgray;
+  padding: 5px;
+  border-radius: 3px;
+  pointer-events: none;
+}
