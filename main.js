@@ -37,8 +37,27 @@ const prepareDatasets = (data) => {
 };
 
 const prepareScatterDatasets = (data) => {
-  const profitBySale = data.map((d) => ({ sales: d.Sales, profit: d.Profit }));
-  return { profitBySale };
+  const profitBySale = data
+    .map((d) => ({ sales: d.Sales, profit: d.Profit }))
+    .sort((a, b) => d3.descending(a.profit, b.profit))
+    .slice(0, 300);
+
+  const quantityDiscount = data.map((d) => ({
+    discount: d.Discount,
+    quantity: d.Quantity,
+  }));
+
+  const shipModeMap = {
+    "Same Day": 1,
+    "First Class": 2,
+    "Second Class": 3,
+    "Standard Class": 4,
+  };
+  const profitShipMode = data.map((d) => ({
+    shipMode: shipModeMap[d["Ship Mode"]],
+    profit: d.Profit,
+  }));
+  return { profitBySale, quantityDiscount, profitShipMode };
 };
 
 const getLabel = (dataset) => {
@@ -94,7 +113,7 @@ const main = async () => {
   // Seletors
   d3.select(".bar-selector")
     .append("select")
-    .attr("id", "dataset-selector")
+    .attr("id", "bar-selector")
     .selectAll("option")
     .data([
       { label: "Sales by Category", value: "salesByCategory" },
@@ -108,12 +127,12 @@ const main = async () => {
 
   d3.select(".scatter-selector")
     .append("select")
-    .attr("id", "dataset-selector")
+    .attr("id", "scatter-selector")
     .selectAll("option")
     .data([
-      { label: "Sales by Category", value: "salesByCategory" },
-      { label: "Profit by Country", value: "profitByCountry" },
-      { label: "Top 10 Products by Sales", value: "top10Products" },
+      { label: "Profit by Sale", value: "profitBySale" },
+      { label: "Quantity by Discount", value: "quantityDiscount" },
+      { label: "Profit by Ship Mode", value: "profitShipMode" },
     ])
     .enter()
     .append("option")
@@ -121,10 +140,16 @@ const main = async () => {
     .text((d) => d.label);
 
   // Add event listener for dataset changes
-  d3.select("#dataset-selector").on("change", (event) => {
+  d3.select("#bar-selector").on("change", (event) => {
     const selectedDataset = event.target.value;
     labels = getLabel(selectedDataset);
     barChart.update(datasets[selectedDataset], labels);
+  });
+
+  d3.select("#scatter-selector").on("change", (event) => {
+    const selectedDataset = event.target.value;
+    labels = getLabel(selectedDataset);
+    scatterPlot.update(datasets[selectedDataset], labels);
   });
 };
 
