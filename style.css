@@ -21,9 +21,10 @@ main {
 
 .canva {
   width: 85%;
-  height: 100vh;
+  height: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -31,7 +32,7 @@ main {
   display: flex;
   flex-direction: column;
   width: 15%;
-  height: 100vh;
+  height: 300vh;
   background-color: #0f62ac;
   border-top: 1px solid white;
 }
@@ -67,6 +68,8 @@ main {
 
 .chart {
   box-shadow: 3px 3px 5px gray;
+  min-width: 60%;
+  margin-top: 3em;
 }
 
 #tooltip {

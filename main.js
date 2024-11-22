@@ -36,6 +36,11 @@ const prepareDatasets = (data) => {
   return { salesByCategory, profitByCountry, top10Products };
 };
 
+const prepareScatterDatasets = (data) => {
+  const profitBySale = data.map((d) => ({ sales: d.Sales, profit: d.Profit }));
+  return { profitBySale };
+};
+
 const getLabel = (dataset) => {
   switch (dataset) {
     case "profitByCountry":
@@ -68,19 +73,40 @@ const main = async () => {
   const colors = {
     bar: "steelblue",
   };
-  let labels = getLabel("sbc");
+  let labels = getLabel("default");
   const config = new Config(800, 600, margin, colors, labels);
   let data = await loadData("./data/superstore.json");
   const datasets = prepareDatasets(data);
+  const scatterDatasets = prepareScatterDatasets(data);
 
-  // Create bar charts
-
-  let barChart = new BarChart(".chart", config, datasets.salesByCategory);
+  // Create charts
+  let barChart = new BarChart(".bar", config, datasets.salesByCategory);
+  let scatterPlot = new ScatterPlot(
+    ".scatter",
+    config,
+    scatterDatasets.profitBySale
+  );
 
   // Render
   barChart.render();
+  scatterPlot.render();
 
+  // Seletors
   d3.select(".bar-selector")
+    .append("select")
+    .attr("id", "dataset-selector")
+    .selectAll("option")
+    .data([
+      { label: "Sales by Category", value: "salesByCategory" },
+      { label: "Profit by Country", value: "profitByCountry" },
+      { label: "Top 10 Products by Sales", value: "top10Products" },
+    ])
+    .enter()
+    .append("option")
+    .attr("value", (d) => d.value)
+    .text((d) => d.label);
+
+  d3.select(".scatter-selector")
     .append("select")
     .attr("id", "dataset-selector")
     .selectAll("option")
