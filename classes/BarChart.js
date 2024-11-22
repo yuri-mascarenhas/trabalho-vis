@@ -11,12 +11,7 @@ class BarChart {
 
   initChart() {
     // Convert data into array of objects
-    this.aggregatedData = Array.from(this.data, ([category, sales]) => ({
-      category,
-      sales,
-    }));
-
-    const { margin } = this.config;
+    const { margin, labels } = this.config;
 
     // SVG creation
     this.svg = d3
@@ -28,24 +23,34 @@ class BarChart {
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
-    this.x = d3
-      .scaleBand()
-      .domain(this.aggregatedData.map((d) => d.category))
-      .range([0, this.width])
-      .padding(0.2);
+    this.x = d3.scaleBand().range([0, this.width]).padding(0.2);
+    this.y = d3.scaleLinear().range([this.height, 0]);
 
-    this.y = d3
-      .scaleLinear()
-      .domain([0, d3.max(this.aggregatedData, (d) => d.sales)])
-      .range([this.height, 0]);
-    // Draw x-axis
-    this.svg
+    // Add axis groups
+    this.xAxisGroup = this.svg
       .append("g")
-      .attr("transform", `translate(0,${this.height})`)
-      .call(d3.axisBottom(this.x));
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0, ${this.height})`);
 
-    // Draw y-axis
-    this.svg.append("g").call(d3.axisLeft(this.y));
+    this.yAxisGroup = this.svg.append("g").attr("class", "y-axis");
+
+    // Add axis labels
+    this.xAxisLabel = this.svg
+      .append("text")
+      .attr("class", "x-axis-label")
+      .attr("x", this.width / 2)
+      .attr("y", this.height + margin.bottom - 5)
+      .attr("text-anchor", "middle")
+      .text(labels.x);
+
+    this.yAxisLabel = this.svg
+      .append("text")
+      .attr("class", "y-axis-label")
+      .attr("x", -this.height / 2)
+      .attr("y", -margin.left + 10)
+      .attr("transform", "rotate(-90)")
+      .attr("text-anchor", "middle")
+      .text(labels.y);
   }
 
   render() {
@@ -54,7 +59,7 @@ class BarChart {
     // Render bars using aggregated data
     this.svg
       .selectAll("rect")
-      .data(this.aggregatedData)
+      .data(this.data)
       .enter()
       .append("rect")
       .attr("x", (d) => {
@@ -71,5 +76,10 @@ class BarChart {
         return heightVal;
       })
       .attr("fill", colors.bar);
+  }
+
+  update(newData) {
+    this.data = newData;
+    this.render();
   }
 }

@@ -7,25 +7,36 @@ body {
 
 header {
   display: flex;
-  height: 10%;
   background-color: #0f62ac;
   color: white;
   justify-content: space-between;
+  font-size: 1.25em;
   padding: 0.12em 0.5em;
 }
 
 main {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
-.canva > * {
-  margin: 20px 20px;
-  padding: 20px;
-  border: solid 1px #0f63acb4;
-  border-radius: 6px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: white;
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 15%;
+  height: 100vh;
+  background-color: #0f62ac;
+  border-top: 1px solid white;
+}
+
+.sidebar > * {
+  width: 90%;
+  margin: 2.5%;
+}
+
+.selector-title {
+  color: white;
+  font-weight: bold;
+  text-decoration: underline solid white;
 }
 
 .axis-label {
