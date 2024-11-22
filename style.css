@@ -31,6 +31,10 @@ main {
   margin-left: 15%;
 }
 
+.canva:last-child {
+  margin-bottom: 3em;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
