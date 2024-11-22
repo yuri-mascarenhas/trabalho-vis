@@ -82,4 +82,9 @@ class BarChart {
     // Remove any extra bars
     bars.exit().remove();
   }
+
+  update(newData) {
+    this.data = newData;
+    this.render();
+  }
 }
