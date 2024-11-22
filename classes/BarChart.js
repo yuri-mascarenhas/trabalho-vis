@@ -63,7 +63,11 @@ class BarChart {
     this.y.domain([0, d3.max(this.data, (d) => d[yKey])]);
 
     // Update axes
-    this.xAxisGroup.call(d3.axisBottom(this.x));
+    this.xAxisGroup
+      .call(d3.axisBottom(this.x))
+      .selectAll("text")
+      .attr("transform", "rotate(-45)")
+      .style("text-anchor", "end");
     this.yAxisGroup.call(d3.axisLeft(this.y));
 
     // Render bars
@@ -83,8 +87,9 @@ class BarChart {
     bars.exit().remove();
   }
 
-  update(newData) {
+  update(newData, newLabels) {
     this.data = newData;
+    this.config.labels = newLabels;
     this.render();
   }
 }

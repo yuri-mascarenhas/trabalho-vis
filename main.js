@@ -36,6 +36,26 @@ const prepareDatasets = (data) => {
   return { salesByCategory, profitByCountry, top10Products };
 };
 
+const getLabel = (dataset) => {
+  switch (dataset) {
+    case "profitByCountry":
+      return {
+        x: "Country",
+        y: "Profit",
+      };
+    case "top10Products":
+      return {
+        x: "Product",
+        y: "Sales",
+      };
+    default:
+      return {
+        x: "Categories",
+        y: "Sales",
+      };
+  }
+};
+
 // Main Function
 const main = async () => {
   // Create configuration object and load data
@@ -48,17 +68,14 @@ const main = async () => {
   const colors = {
     bar: "steelblue",
   };
-  let labels = {
-    x: "Categories",
-    y: "Sales",
-  };
+  let labels = getLabel("sbc");
   const config = new Config(800, 600, margin, colors, labels);
   let data = await loadData("./data/superstore.json");
   const datasets = prepareDatasets(data);
 
   // Create bar charts
 
-  let barChart = new BarChart(".chart", config, datasets.profitByCountry);
+  let barChart = new BarChart(".chart", config, datasets.salesByCategory);
 
   // Render
   barChart.render();
@@ -80,7 +97,8 @@ const main = async () => {
   // Add event listener for dataset changes
   d3.select("#dataset-selector").on("change", (event) => {
     const selectedDataset = event.target.value;
-    barChart.update(datasets[selectedDataset]);
+    labels = getLabel(selectedDataset);
+    barChart.update(datasets[selectedDataset], labels);
   });
 };
 
