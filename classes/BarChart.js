@@ -54,7 +54,7 @@ class BarChart {
   }
 
   render() {
-    const { colors } = this.config;
+    const { colors, labels } = this.config;
     const tooltip = d3.select("#tooltip"); // Select the tooltip div
 
     const xKey = Object.keys(this.data[0])[0];
@@ -64,7 +64,14 @@ class BarChart {
     this.y.domain([0, d3.max(this.data, (d) => d[yKey])]);
 
     // Update axes
-    this.xAxisGroup.call(d3.axisBottom(this.x));
+    const xAxis = this.xAxisGroup.call(d3.axisBottom(this.x));
+    console.log(labels.x);
+    if (labels.x === "Product") {
+      xAxis.selectAll("text").style("opacity", 0); // Hide tick text
+    } else {
+      xAxis.selectAll("text").style("opacity", 1); // Show tick text
+    }
+
     this.yAxisGroup.call(d3.axisLeft(this.y));
 
     // Render bars
@@ -102,10 +109,13 @@ class BarChart {
 
   update(newData, newLabels) {
     this.data = newData;
+
     if (newLabels) {
+      this.config.labels = newLabels;
       this.xAxisLabel.text(newLabels.x || xKey);
       this.yAxisLabel.text(newLabels.y || yKey);
     }
+
     this.render();
   }
 }
