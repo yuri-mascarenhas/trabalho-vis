@@ -19,6 +19,14 @@ main {
   flex-direction: row;
 }
 
+.canva {
+  width: 85%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -55,4 +63,8 @@ main {
   font-size: 14px;
   text-anchor: middle;
   fill: #555;
+}
+
+.chart {
+  box-shadow: 3px 3px 5px gray;
 }

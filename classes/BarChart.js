@@ -37,17 +37,17 @@ class BarChart {
     // Add axis labels
     this.xAxisLabel = this.svg
       .append("text")
-      .attr("class", "x-axis-label")
+      .attr("class", "axis-label")
       .attr("x", this.width / 2)
-      .attr("y", this.height + margin.bottom - 5)
+      .attr("y", this.height + margin.bottom - 10)
       .attr("text-anchor", "middle")
       .text(labels.x);
 
     this.yAxisLabel = this.svg
       .append("text")
-      .attr("class", "y-axis-label")
+      .attr("class", "axis-label")
       .attr("x", -this.height / 2)
-      .attr("y", -margin.left + 10)
+      .attr("y", -(margin.left - 25))
       .attr("transform", "rotate(-90)")
       .attr("text-anchor", "middle")
       .text(labels.y);

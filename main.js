@@ -19,7 +19,9 @@ const prepareDatasets = (data) => {
       (v) => d3.sum(v, (d) => d.Profit),
       (d) => d.Country
     )
-    .map(([country, profit]) => ({ country, profit }));
+    .map(([country, profit]) => ({ country, profit }))
+    .sort((a, b) => d3.descending(a.profit, b.profit))
+    .slice(0, 10);
 
   const top10Products = d3
     .rollups(
@@ -38,25 +40,25 @@ const prepareDatasets = (data) => {
 const main = async () => {
   // Create configuration object and load data
   const margin = {
-    top: 30,
-    right: 20,
-    bottom: 20,
-    left: 80,
+    top: 50,
+    right: 30,
+    bottom: 60,
+    left: 100,
   };
   const colors = {
     bar: "steelblue",
   };
   let labels = {
-    x: "X axis",
-    y: "Y axis",
+    x: "Categories",
+    y: "Sales",
   };
-  const config = new Config(500, 500, margin, colors, labels);
+  const config = new Config(800, 600, margin, colors, labels);
   let data = await loadData("./data/superstore.json");
   const datasets = prepareDatasets(data);
 
   // Create bar charts
 
-  let barChart = new BarChart(".bar-charts", config, datasets.salesByCategory);
+  let barChart = new BarChart(".chart", config, datasets.profitByCountry);
 
   // Render
   barChart.render();
