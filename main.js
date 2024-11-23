@@ -95,41 +95,38 @@ const prepareHeatDatasets = (data) => {
   const dailySales = data
     .map((d) => {
       const date = parseDate(d["Order Date"]);
-      const dayOfWeek = date.getDay();
-      const weekOfYear = getWeekNumber(date);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
       return {
-        dayOfWeek,
-        weekOfYear,
+        day,
+        month,
         sales: d.Sales,
       };
     })
     .reduce((acc, d) => {
-      const key = `${d.weekOfYear}-${d.dayOfWeek}`;
+      const key = `${d.month}-${d.day}`;
       if (!acc[key]) {
         acc[key] = { sales: 0 };
       }
       acc[key].sales += d.sales;
       return acc;
     }, {});
-  const formattedDailySales = Object.keys(dailySales).map((key) => {
-    const [weekOfYear, dayOfWeek] = key.split("-");
-    return {
-      weekOfYear: +weekOfYear,
-      dayOfWeek: +dayOfWeek,
-      sales: dailySales[key].sales,
-    };
-  });
+
+  const formattedDailySales = Array.from({ length: 12 }, (_, monthIndex) => {
+    return Array.from({ length: 31 }, (_, dayIndex) => {
+      const day = dayIndex + 1;
+      const month = monthIndex + 1;
+
+      const key = `${month}-${day}`;
+      const sales = dailySales[key] ? dailySales[key].sales : 0;
+
+      return { day, month, sales };
+    });
+  }).flat();
 
   const monthlySales = data
     .map((d) => {
-      const date = parseDate(d["Order Date"]);
-      const month = date.getMonth();
-      const quarter = Math.floor(month / 3) + 1;
-      return {
-        month,
-        quarter,
-        sales: d.Sales,
-      };
+      return {};
     })
     .reduce((acc, d) => {
       const key = `${d.quarter}-${d.month}`;
@@ -139,12 +136,13 @@ const prepareHeatDatasets = (data) => {
       acc[key].sales += d.sales;
       return acc;
     }, {});
-  const formattedMonthlySales = Object.keys(monthlySales).map((key) => {
-    const [quarter, month] = key.split("-");
-    return { quarter: +quarter, month: +month, sales: monthlySales[key].sales };
-  });
 
-  console.log(formattedDailySales);
+  const formattedMonthlySales = Array.from({ length: 4 }, (_, quarterIndex) => {
+    return Array.from({ length: 3 }, (_, monthIndex) => {
+      const key = `${quarter}-${month}`;
+      const sales = monthlySales[key] ? monthlySales[key].sales : 0;
+    });
+  }).flat();
 
   return {
     sumSalesRegionCategory,
@@ -199,13 +197,13 @@ const getHeatLabel = (dataset) => {
   switch (dataset) {
     case "dailySales":
       return {
-        x: "Day of Week",
-        y: "Week of Year",
+        x: "Day of Month",
+        y: "Month of Year",
       };
     case "monthlySales":
       return {
         x: "Month",
-        y: "Quarter",
+        y: "Year",
       };
     default:
       return {
