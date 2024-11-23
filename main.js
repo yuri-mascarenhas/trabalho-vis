@@ -126,7 +126,14 @@ const prepareHeatDatasets = (data) => {
 
   const monthlySales = data
     .map((d) => {
-      return {};
+      const date = parseDate(d["Order Date"]);
+      const month = date.getMonth();
+      const quarter = Math.floor(month / 3);
+      return {
+        month: (month % 3) + 1,
+        quarter,
+        sales: d.Sales,
+      };
     })
     .reduce((acc, d) => {
       const key = `${d.quarter}-${d.month}`;
@@ -139,8 +146,13 @@ const prepareHeatDatasets = (data) => {
 
   const formattedMonthlySales = Array.from({ length: 4 }, (_, quarterIndex) => {
     return Array.from({ length: 3 }, (_, monthIndex) => {
+      const month = monthIndex + 1;
+      const quarter = quarterIndex;
+
       const key = `${quarter}-${month}`;
       const sales = monthlySales[key] ? monthlySales[key].sales : 0;
+
+      return { month, quarter: quarter + 1, sales };
     });
   }).flat();
 
