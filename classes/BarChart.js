@@ -65,7 +65,6 @@ class BarChart {
 
     // Update axes
     const xAxis = this.xAxisGroup.call(d3.axisBottom(this.x));
-    console.log(labels.x);
     if (labels.x === "Product") {
       xAxis.selectAll("text").style("opacity", 0); // Hide tick text
     } else {
