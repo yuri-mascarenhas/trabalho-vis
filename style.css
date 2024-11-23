@@ -88,3 +88,15 @@ main {
   border-radius: 3px;
   pointer-events: none;
 }
+
+#bar-selector {
+  width: 100%;
+}
+
+#scatter-selector {
+  max-width: 100%;
+}
+
+#heat-selector {
+  max-width: 100%;
+}

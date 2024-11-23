@@ -24,14 +24,10 @@ class HeatMap {
     // Create scales
     this.x = d3.scaleBand().range([0, this.width]).padding(0.05);
     this.y = d3.scaleBand().range([0, this.height]).padding(0.05);
-    this.colorScale = d3.scaleSequential(d3.interpolateBlues);
+    this.colorScale = d3.scaleSequential(d3.interpolateBlues); // Default color scale
 
     // Add axis groups
-    this.xAxisGroup = this.svg
-      .append("g")
-      .attr("class", "x-axis")
-      .attr("transform", `translate(0, ${this.height})`);
-
+    this.xAxisGroup = this.svg.append("g").attr("class", "x-axis");
     this.yAxisGroup = this.svg.append("g").attr("class", "y-axis");
 
     // Add axis labels
@@ -55,21 +51,27 @@ class HeatMap {
 
   render() {
     const { colors, labels } = this.config;
-    const tooltip = d3.select("#tooltip"); // Select the tooltip div
+    const tooltip = d3.select("#tooltip");
 
-    // Define xKey, yKey, and valueKey dynamically from the data
-    const xKey = Object.keys(this.data[0])[0]; // First key for x-axis
-    const yKey = Object.keys(this.data[0])[1]; // Second key for y-axis
-    const valueKey = Object.keys(this.data[0])[2]; // Third key for cell value
+    const xKey = Object.keys(this.data[0])[0];
+    const yKey = Object.keys(this.data[0])[1];
+    const valueKey = Object.keys(this.data[0])[2];
 
     // Update scales
-    this.x.domain([...new Set(this.data.map((d) => d[xKey]))]); // Unique x-axis labels
-    this.y.domain([...new Set(this.data.map((d) => d[yKey]))]); // Unique y-axis labels
-    this.colorScale.domain([0, d3.max(this.data, (d) => d[valueKey])]); // Color scale domain
+    this.x.domain([...new Set(this.data.map((d) => d[xKey]))]);
+    this.y.domain([...new Set(this.data.map((d) => d[yKey]))]);
+    this.colorScale.domain([0, d3.max(this.data, (d) => d[valueKey])]);
 
     // Update axes
-    this.xAxisGroup.call(d3.axisBottom(this.x));
-    this.yAxisGroup.call(d3.axisLeft(this.y));
+    this.xAxisGroup
+      .call(d3.axisBottom(this.x).tickSize(0))
+      .selectAll("text")
+      .attr("transform", "translate(0, -10)")
+      .style("text-anchor", "middle");
+    this.xAxisGroup.selectAll("path, line").style("display", "none");
+
+    this.yAxisGroup.call(d3.axisLeft(this.y).tickSize(0));
+    this.yAxisGroup.selectAll("path, line").style("display", "none");
 
     // Render cells
     const cells = this.svg.selectAll("rect").data(this.data);
@@ -99,8 +101,8 @@ class HeatMap {
           .style("top", `${event.pageY - 20}px`);
       })
       .on("mouseout", function () {
-        d3.select(this).attr("stroke", "none"); // Reset cell highlight
-        tooltip.style("opacity", 0); // Hide tooltip
+        d3.select(this).attr("stroke", "none");
+        tooltip.style("opacity", 0);
       });
 
     cells.exit().remove();

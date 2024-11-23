@@ -212,7 +212,12 @@ const main = async () => {
     .append("select")
     .attr("id", "heat-selector")
     .selectAll("option")
-    .data([{ label: "Profit by Sale", value: "profitBySale" }])
+    .data([
+      {
+        label: "Sales sum by Category/Region",
+        value: "sumSalesRegionCategory",
+      },
+    ])
     .enter()
     .append("option")
     .attr("value", (d) => d.value)
