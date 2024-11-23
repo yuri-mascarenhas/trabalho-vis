@@ -1,3 +1,13 @@
+// Other functions
+function getWeekNumber(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  const weekNumber = Math.ceil(((d - week1) / 86400000 + 1) / 7);
+  return weekNumber;
+}
+
 // Prepare data functions
 const loadData = async (file) => {
   const data = await d3.json(file);
@@ -77,8 +87,50 @@ const prepareHeatDatasets = (data) => {
     )
     .flat();
 
+  const dailySales = data
+    .map((d) => {
+      const date = new Date(d.OrderDate);
+      const dayOfWeek = date.getDay();
+      const weekOfYear = getWeekNumber(date);
+      return {
+        dayOfWeek, // Day of the week (0 to 6)
+        weekOfYear, // Week number (1 to 52/53)
+        sales: d.Sales, // Sales value for this transaction
+      };
+    })
+    .reduce((acc, d) => {
+      const key = `${d.weekOfYear}-${d.dayOfWeek}`;
+      if (!acc[key]) {
+        acc[key] = { sales: 0 };
+      }
+      acc[key].sales += d.sales;
+      return acc;
+    }, {});
+
+  const monthlySales = data
+    .map((d) => {
+      const date = new Date(d.OrderDate);
+      const month = date.getMonth(); // Get the month (0 = January, 11 = December)
+      const quarter = Math.floor(month / 3) + 1; // Determine the quarter (1, 2, 3, or 4)
+      return {
+        month, // Month (0 = January, 11 = December)
+        quarter, // Quarter (1 to 4)
+        sales: d.Sales, // Sales value for this transaction
+      };
+    })
+    .reduce((acc, d) => {
+      const key = `${d.quarter}-${d.month}`;
+      if (!acc[key]) {
+        acc[key] = { sales: 0 };
+      }
+      acc[key].sales += d.sales;
+      return acc;
+    }, {});
+
   return {
     sumSalesRegionCategory,
+    dailySales,
+    monthlySales,
   };
 };
 
@@ -126,10 +178,20 @@ const getScatterLabel = (dataset) => {
 
 const getHeatLabel = (dataset) => {
   switch (dataset) {
+    case "dailySales":
+      return {
+        x: "Day of Week",
+        y: "Week of Year",
+      };
+    case "monthlySales":
+      return {
+        x: "Month",
+        y: "Quarter",
+      };
     default:
       return {
-        x: "Profit",
-        y: "Sales",
+        x: "Region",
+        y: "Category",
       };
   }
 };
@@ -217,6 +279,14 @@ const main = async () => {
         label: "Sales sum by Category/Region",
         value: "sumSalesRegionCategory",
       },
+      {
+        label: "Daily Sales",
+        value: "dailySales",
+      },
+      {
+        label: "Monthly Sales",
+        value: "monthlySales",
+      },
     ])
     .enter()
     .append("option")
@@ -234,6 +304,12 @@ const main = async () => {
     const selectedDataset = event.target.value;
     scatterLabels = getScatterLabel(selectedDataset);
     scatterPlot.update(scatterDatasets[selectedDataset], scatterLabels);
+  });
+
+  d3.select("#heat-selector").on("change", (event) => {
+    const selectedDataset = event.target.value;
+    heatLabels = getHeatLabel(selectedDataset);
+    heatMap.update(heatDatasets[selectedDataset], heatLabels);
   });
 };
 
