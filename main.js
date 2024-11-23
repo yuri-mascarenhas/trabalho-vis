@@ -214,8 +214,8 @@ const getHeatLabel = (dataset) => {
       };
     case "monthlySales":
       return {
-        x: "Month",
-        y: "Year",
+        x: "Month of Quarter",
+        y: "Quarter of Year",
       };
     default:
       return {
