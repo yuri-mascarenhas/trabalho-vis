@@ -80,6 +80,26 @@ const getLabel = (dataset) => {
   }
 };
 
+const getScatterLabel = (dataset) => {
+  switch (dataset) {
+    case "quantityDiscount":
+      return {
+        x: "Discount",
+        y: "Quantity",
+      };
+    case "profitShipMode":
+      return {
+        x: "Ship Mode",
+        y: "Profit",
+      };
+    default:
+      return {
+        x: "Sales",
+        y: "Profit",
+      };
+  }
+};
+
 // Main Function
 const main = async () => {
   // Create configuration object and load data
@@ -93,7 +113,9 @@ const main = async () => {
     bar: "steelblue",
   };
   let labels = getLabel("default");
+  let scatterLabels = getScatterLabel("default");
   const config = new Config(800, 600, margin, colors, labels);
+  const scatterConfig = new Config(800, 600, margin, colors, scatterLabels);
   let data = await loadData("./data/superstore.json");
   const datasets = prepareDatasets(data);
   const scatterDatasets = prepareScatterDatasets(data);
@@ -102,7 +124,7 @@ const main = async () => {
   let barChart = new BarChart(".bar", config, datasets.salesByCategory);
   let scatterPlot = new ScatterPlot(
     ".scatter",
-    config,
+    scatterConfig,
     scatterDatasets.profitBySale
   );
 
@@ -148,8 +170,8 @@ const main = async () => {
 
   d3.select("#scatter-selector").on("change", (event) => {
     const selectedDataset = event.target.value;
-    labels = getLabel(selectedDataset);
-    scatterPlot.update(datasets[selectedDataset], labels);
+    scatterLabels = getScatterLabel(selectedDataset);
+    scatterPlot.update(datasets[selectedDataset], scatterLabels);
   });
 };
 
