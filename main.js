@@ -42,22 +42,22 @@ const prepareScatterDatasets = (data) => {
     .sort((a, b) => d3.descending(a.profit, b.profit))
     .slice(0, 300);
 
-  const quantityDiscount = data.map((d) => ({
-    discount: d.Discount,
-    quantity: d.Quantity,
-  }));
+  const salesProfitMargin = data
+    .filter((d) => d.Sales > 0 && d.Profit > 0)
+    .map((d) => ({
+      profitMargin: d.Profit / d.Sales,
+      sales: d.Sales,
+    }))
+    .sort((a, b) => d3.descending(a.sales, b.sales))
+    .slice(0, 300);
 
-  const shipModeMap = {
-    "Same Day": 1,
-    "First Class": 2,
-    "Second Class": 3,
-    "Standard Class": 4,
-  };
-  const profitShipMode = data.map((d) => ({
-    shipMode: shipModeMap[d["Ship Mode"]],
-    profit: d.Profit,
-  }));
-  return { profitBySale, quantityDiscount, profitShipMode };
+  const highProfitShippingCost = data
+    .filter((d) => d.Profit > 50 && d["Shipping Cost"] > 0)
+    .map((d) => ({ shippingCost: d["Shipping Cost"], profit: d.Profit }))
+    .sort((a, b) => d3.descending(a.profit, b.profit))
+    .slice(0, 300);
+
+  return { profitBySale, salesProfitMargin, highProfitShippingCost };
 };
 
 const getLabel = (dataset) => {
@@ -82,20 +82,20 @@ const getLabel = (dataset) => {
 
 const getScatterLabel = (dataset) => {
   switch (dataset) {
-    case "quantityDiscount":
+    case "salesProfitMargin":
       return {
-        x: "Discount",
-        y: "Quantity",
+        x: "Profit Margin",
+        y: "Sales",
       };
-    case "profitShipMode":
+    case "highProfitShippingCost":
       return {
-        x: "Ship Mode",
+        x: "Shipping Cost",
         y: "Profit",
       };
     default:
       return {
-        x: "Sales",
-        y: "Profit",
+        x: "Profit",
+        y: "Sales",
       };
   }
 };
@@ -153,15 +153,18 @@ const main = async () => {
     .selectAll("option")
     .data([
       { label: "Profit by Sale", value: "profitBySale" },
-      { label: "Quantity by Discount", value: "quantityDiscount" },
-      { label: "Profit by Ship Mode", value: "profitShipMode" },
+      { label: "Sales by Profit Margin", value: "salesProfitMargin" },
+      {
+        label: "(High) Profit by Shipping Cost",
+        value: "highProfitShippingCost",
+      },
     ])
     .enter()
     .append("option")
     .attr("value", (d) => d.value)
     .text((d) => d.label);
 
-  // Add event listener for dataset changes
+  // Event listener for dataset changes
   d3.select("#bar-selector").on("change", (event) => {
     const selectedDataset = event.target.value;
     labels = getLabel(selectedDataset);
@@ -171,7 +174,7 @@ const main = async () => {
   d3.select("#scatter-selector").on("change", (event) => {
     const selectedDataset = event.target.value;
     scatterLabels = getScatterLabel(selectedDataset);
-    scatterPlot.update(datasets[selectedDataset], scatterLabels);
+    scatterPlot.update(scatterDatasets[selectedDataset], scatterLabels);
   });
 };
 
