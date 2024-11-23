@@ -1,4 +1,4 @@
-// Utils Functions
+// Prepare data functions
 const loadData = async (file) => {
   const data = await d3.json(file);
   return data;
@@ -60,6 +60,30 @@ const prepareScatterDatasets = (data) => {
   return { profitBySale, salesProfitMargin, highProfitShippingCost };
 };
 
+const prepareHeatDatasets = (data) => {
+  const sumSalesRegionCategory = d3
+    .rollups(
+      data,
+      (v) => d3.sum(v, (d) => d.Sales),
+      (d) => d.Region,
+      (d) => d.Category
+    )
+    .map(([region, categories]) =>
+      categories.map(([category, sales]) => ({
+        region,
+        category,
+        sales,
+      }))
+    )
+    .flat();
+
+  return {
+    sumSalesRegionCategory,
+  };
+};
+
+// Get label functions
+
 const getLabel = (dataset) => {
   switch (dataset) {
     case "profitByCountry":
@@ -100,6 +124,16 @@ const getScatterLabel = (dataset) => {
   }
 };
 
+const getHeatLabel = (dataset) => {
+  switch (dataset) {
+    default:
+      return {
+        x: "Profit",
+        y: "Sales",
+      };
+  }
+};
+
 // Main Function
 const main = async () => {
   // Create configuration object and load data
@@ -114,11 +148,15 @@ const main = async () => {
   };
   let labels = getLabel("default");
   let scatterLabels = getScatterLabel("default");
+  let heatLabels = getHeatLabel("default");
   const config = new Config(800, 600, margin, colors, labels);
   const scatterConfig = new Config(800, 600, margin, colors, scatterLabels);
+  const heatConfig = new Config(800, 600, margin, colors, heatLabels);
+
   let data = await loadData("./data/superstore.json");
   const datasets = prepareDatasets(data);
   const scatterDatasets = prepareScatterDatasets(data);
+  const heatDatasets = prepareHeatDatasets(data);
 
   // Create charts
   let barChart = new BarChart(".bar", config, datasets.salesByCategory);
@@ -127,10 +165,16 @@ const main = async () => {
     scatterConfig,
     scatterDatasets.profitBySale
   );
+  let heatMap = new HeatMap(
+    ".heat",
+    heatConfig,
+    heatDatasets.sumSalesRegionCategory
+  );
 
   // Render
   barChart.render();
   scatterPlot.render();
+  heatMap.render();
 
   // Seletors
   d3.select(".bar-selector")
@@ -159,6 +203,16 @@ const main = async () => {
         value: "highProfitShippingCost",
       },
     ])
+    .enter()
+    .append("option")
+    .attr("value", (d) => d.value)
+    .text((d) => d.label);
+
+  d3.select(".heat-selector")
+    .append("select")
+    .attr("id", "heat-selector")
+    .selectAll("option")
+    .data([{ label: "Profit by Sale", value: "profitBySale" }])
     .enter()
     .append("option")
     .attr("value", (d) => d.value)
