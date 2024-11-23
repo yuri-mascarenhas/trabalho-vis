@@ -94,9 +94,9 @@ main {
 }
 
 #scatter-selector {
-  max-width: 100%;
+  width: 100%;
 }
 
 #heat-selector {
-  max-width: 100%;
+  width: 100%;
 }
