@@ -8,6 +8,11 @@ function getWeekNumber(date) {
   return weekNumber;
 }
 
+function parseDate(dateString) {
+  const parts = dateString.split("-");
+  return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+}
+
 // Prepare data functions
 const loadData = async (file) => {
   const data = await d3.json(file);
@@ -89,13 +94,13 @@ const prepareHeatDatasets = (data) => {
 
   const dailySales = data
     .map((d) => {
-      const date = new Date(d.OrderDate);
+      const date = parseDate(d["Order Date"]);
       const dayOfWeek = date.getDay();
       const weekOfYear = getWeekNumber(date);
       return {
-        dayOfWeek, // Day of the week (0 to 6)
-        weekOfYear, // Week number (1 to 52/53)
-        sales: d.Sales, // Sales value for this transaction
+        dayOfWeek,
+        weekOfYear,
+        sales: d.Sales,
       };
     })
     .reduce((acc, d) => {
@@ -106,16 +111,24 @@ const prepareHeatDatasets = (data) => {
       acc[key].sales += d.sales;
       return acc;
     }, {});
+  const formattedDailySales = Object.keys(dailySales).map((key) => {
+    const [weekOfYear, dayOfWeek] = key.split("-");
+    return {
+      weekOfYear: +weekOfYear,
+      dayOfWeek: +dayOfWeek,
+      sales: dailySales[key].sales,
+    };
+  });
 
   const monthlySales = data
     .map((d) => {
-      const date = new Date(d.OrderDate);
-      const month = date.getMonth(); // Get the month (0 = January, 11 = December)
-      const quarter = Math.floor(month / 3) + 1; // Determine the quarter (1, 2, 3, or 4)
+      const date = parseDate(d["Order Date"]);
+      const month = date.getMonth();
+      const quarter = Math.floor(month / 3) + 1;
       return {
-        month, // Month (0 = January, 11 = December)
-        quarter, // Quarter (1 to 4)
-        sales: d.Sales, // Sales value for this transaction
+        month,
+        quarter,
+        sales: d.Sales,
       };
     })
     .reduce((acc, d) => {
@@ -126,11 +139,17 @@ const prepareHeatDatasets = (data) => {
       acc[key].sales += d.sales;
       return acc;
     }, {});
+  const formattedMonthlySales = Object.keys(monthlySales).map((key) => {
+    const [quarter, month] = key.split("-");
+    return { quarter: +quarter, month: +month, sales: monthlySales[key].sales };
+  });
+
+  console.log(formattedDailySales);
 
   return {
     sumSalesRegionCategory,
-    dailySales,
-    monthlySales,
+    dailySales: formattedDailySales,
+    monthlySales: formattedMonthlySales,
   };
 };
 
