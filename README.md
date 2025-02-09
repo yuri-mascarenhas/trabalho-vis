@@ -10,8 +10,6 @@ The specific visualizations asked were:
 - **Bar chart**
 - **Heatmap**
 
----
-
 ## Project
 
 This project uses the simple yet effective triad of **HTML**, **CSS** and _vanilla_ **JS** along with the **D3.js** library.
@@ -46,15 +44,13 @@ _TODO: explain why is it meaningful_
 
 #### 4.2. Scatter Plot
 
-_TODO: add an image of the chart_
+![Scatter Plot graph](metadata/scatterplot1.png)
 _TODO: explain why is it meaningful_
 
 #### 4.3. Heat Map
 
-_TODO: add an image of the chart_
+![Heat Map graph](metadata/heatmap1.png)
 _TODO: explain why is it meaningful_
-
----
 
 ## How to run it
 
@@ -109,5 +105,3 @@ npm install -g http-server
 ```
 http-server
 ```
-
----
